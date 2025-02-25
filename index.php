@@ -56,3 +56,5 @@ switch ($uri) {
         echo '404 Not Found - URI: ' . $uri;
         break;
 }
+
+//test
