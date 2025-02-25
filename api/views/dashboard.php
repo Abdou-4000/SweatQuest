@@ -187,7 +187,7 @@
             const formData = new FormData(e.target);
             
             try {
-                const response = await fetch('/SweatQuest/workout/log', {
+                const response = await fetch('/SweatQuest/api/workout/log', {
                     method: 'POST',
                     body: formData
                 });
