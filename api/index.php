@@ -1,4 +1,5 @@
 <?php
+phpinfo();
 session_start();
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
@@ -31,7 +32,7 @@ spl_autoload_register(function ($class) {
 // Simple router
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $uri = trim($uri, '/');
-$uri = str_replace('SweatQuest/', '', $uri);
+$uri = str_replace('SweatQuest/api/', '', $uri);
 
 // Routes
 switch ($uri) {

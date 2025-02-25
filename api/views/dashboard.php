@@ -183,35 +183,44 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         document.getElementById('quickLogForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const formData = new FormData(e.target);
-            
-            try {
-                const response = await fetch('/SweatQuest/api/workout/log', {
-                    method: 'POST',
-                    body: formData
-                });
-                
-                const data = await response.json();
-                
-                if (data.success) {
-                    // Show success modal
-                    const successModal = new bootstrap.Modal(document.getElementById('successModal'));
-                    document.getElementById('xpEarned').textContent = `You earned ${data.xp_earned || 'some'} XP!`;
-                    successModal.show();
-                    
-                    // Refresh the page after modal is closed
-                    document.getElementById('successModal').addEventListener('hidden.bs.modal', function () {
-                        location.reload();
-                    });
-                } else {
-                    alert(data.error || 'Failed to log workout');
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                alert('Failed to log workout. Check console for details.');
-            }
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    
+    try {
+        const response = await fetch('/SweatQuest/api/workout/log', {
+            method: 'POST',
+            body: formData
         });
+        
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            // Show success modal
+            const successModal = new bootstrap.Modal(document.getElementById('successModal'));
+            document.getElementById('xpEarned').textContent = `You earned ${data.xp_earned} XP!`;
+            successModal.show();
+            
+            // Reset form
+            e.target.reset();
+            
+            // Refresh the page after modal is closed
+            document.getElementById('successModal').addEventListener('hidden.bs.modal', function () {
+                location.reload();
+            });
+        } else {
+            throw new Error(data.error || 'Failed to log workout');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        // Show error in a more user-friendly way
+        const errorMessage = error.message || 'Failed to log workout. Please try again.';
+        alert(errorMessage);
+    }
+});
     </script>
 </body>
 </html>
