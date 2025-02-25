@@ -6,10 +6,9 @@ class Database {
     private function __construct() {
         try {
             $this->conn = new PDO(
-                "mysql:host=" . getenv('DB_HOST', 'localhost') . 
-                ";dbname=" . getenv('DB_NAME', 'workout_logger'),
-                getenv('DB_USER', 'root'),
-                getenv('DB_PASS', '')
+                "mysql:host=localhost;dbname=workout_logger",
+                "root",
+                ""
             );
             $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             $this->conn->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
@@ -30,4 +29,3 @@ class Database {
         return $this->conn;
     }
 }
-

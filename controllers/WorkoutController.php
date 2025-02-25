@@ -2,10 +2,12 @@
 class WorkoutController {
     private $workout;
     private $achievement;
+    private $exercise;
     
     public function __construct() {
         $this->workout = new Workout();
         $this->achievement = new Achievement();
+        $this->exercise = new Exercise();
     }
     
     public function logWorkout() {
@@ -30,13 +32,16 @@ class WorkoutController {
         }
         
         // Log the workout
-        if ($this->workout->logWorkout($userId, $exerciseId, $sets, $reps, $weight, $notes)) {
+        $result = $this->workout->logWorkout($userId, $exerciseId, $sets, $reps, $weight, $notes);
+        
+        if ($result) {
             // Check for achievements
             $this->achievement->checkAndAwardAchievements($userId);
             
             return json_encode([
                 'success' => true,
-                'message' => 'Workout logged successfully'
+                'message' => 'Workout logged successfully',
+                'xp_earned' => $result['xp_earned']
             ]);
         }
         
@@ -54,8 +59,25 @@ class WorkoutController {
         $stats = $user->getStats($userId);
         $recentWorkouts = $this->workout->getRecentWorkouts($userId);
         
+        // Get all exercises for the dropdown
+        $exercises = $this->exercise->getAllExercises();
+        
+        // Get muscle groups worked (for the stats card)
+        $muscleGroups = $this->getMuscleGroupsWorked($userId);
+        
         // Load the dashboard view with data
         require_once 'views/dashboard.php';
     }
+    
+    private function getMuscleGroupsWorked($userId) {
+        $db = Database::getInstance()->getConnection();
+        $sql = "SELECT DISTINCT e.muscle_group
+                FROM workout_logs w
+                JOIN exercises e ON w.exercise_id = e.id
+                WHERE w.user_id = :user_id";
+                
+        $stmt = $db->prepare($sql);
+        $stmt->execute([':user_id' => $userId]);
+        return $stmt->fetchAll(PDO::FETCH_COLUMN);
+    }
 }
-
